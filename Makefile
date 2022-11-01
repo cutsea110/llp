@@ -1,4 +1,6 @@
-all: ret42 hello hello_proper_exit print_rax
+OBJS=ret42 hello hello_proper_exit print_rax
+
+all: ${OBJS}
 
 ret42: ret42.o
 	ld -o $@ $<
@@ -29,4 +31,4 @@ print_rax.o: print_rax.s
 	nasm -felf64 $< -o $@
 
 clean:
-	rm -f *.o hello hello_proper_exit print_rax *~
+	rm -f *.o *~ ${OBJS}
