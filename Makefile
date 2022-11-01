@@ -1,4 +1,11 @@
-all: hello hello_proper_exit print_rax
+all: ret42 hello hello_proper_exit print_rax
+
+ret42: ret42.o
+	ld -o $@ $<
+	chmod u+x $@
+
+ret42.o: ret42.s
+	nasm -felf64 $< -o $@
 
 hello: hello.o
 	ld -o $@ $<
