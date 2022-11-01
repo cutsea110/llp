@@ -1,4 +1,4 @@
-OBJS=ret42 hello hello_proper_exit print_rax
+OBJS=ret42 hello hello_proper_exit print_rax strlen
 
 all: ${OBJS}
 
@@ -28,6 +28,13 @@ print_rax: print_rax.o
 	chmod u+x $@
 
 print_rax.o: print_rax.s
+	nasm -felf64 $< -o $@
+
+strlen: strlen.o
+	ld -o $@ $<
+	chmod u+x $@
+
+strlen.o: strlen.s
 	nasm -felf64 $< -o $@
 
 clean:
