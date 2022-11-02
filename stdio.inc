@@ -1,5 +1,6 @@
 section .text
 
+; rdi に文字列のポインタがきている
 string_length:
     xor rax, rax
     
@@ -11,6 +12,7 @@ string_length:
     .end:
     ret
 
+; rdi に文字列のポインタがきている
 print_string:
     push rdi
     call string_length
@@ -21,6 +23,7 @@ print_string:
     syscall
     ret
 
+; rsp に文字のポインタが来ている
 print_char:
     push rdi
     mov rdi, rsp
@@ -142,14 +145,45 @@ read_word:
 ; rdi points to a string
 ; returns rax: number, rdx : length
 parse_uint:
+    mov r8, 10
     xor rax, rax
+    xor rcx, rcx
+    .loop:
+    movzx r9, byte[rdi+rcx]
+    cmp r9b, '0'
+    jb .end
+    cmp r9b, '9'
+    ja .end
+    xor rdx, rdx
+    mul r8
+    and r9b, 0x0f
+    add rax, r9
+    inc rcx
+    jmp .loop
+    .end:
+    mov rdx, rcx
     ret
 
 ; rdi points to a string
 ; returns rax: number, rdx : length
 parse_int:
+    mov al, byte[rdi]
+    cmp al, '-'
+    je .signed
+    jmp parse_uint
+    .signed:
+    inc rdi
+    call parse_uint
+    neg rax
+    test rdx, rdx
+    jz .error
+
+    inc rdx
+    ret
+
+    .error:
     xor rax, rax
-    ret 
+    ret
 
 
 string_copy:
