@@ -1,5 +1,9 @@
 section .text
 
+exit:
+    mov rax, 60
+    syscall
+
 ; rdi に文字列のポインタがきている
 string_length:
     xor rax, rax
