@@ -1,7 +1,7 @@
 section .text
 
+; rdi に返り値が渡ってくるのでそのまま出す
 exit:
-    xor rdi, rdi
     mov rax, 60
     syscall
 
