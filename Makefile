@@ -1,4 +1,4 @@
-OBJS=ret42 hello hello_proper_exit print_rax strlen read_char
+OBJS=ret42 hello hello_proper_exit print_rax strlen read_char cat
 
 all: ${OBJS}
 
@@ -42,6 +42,13 @@ read_char: read_char.o
 	chmod u+x $@
 
 read_char.o: read_char.s
+	nasm -felf64 $< -o $@
+
+cat: cat.o
+	ld -o $@ $<
+	chmod u+x $@
+
+cat.o: cat.s
 	nasm -felf64 $< -o $@
 
 clean:
