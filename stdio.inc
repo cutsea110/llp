@@ -1,4 +1,6 @@
-section .text
+[section .text
+
+%define O_RDONLY 0
 
 ; rdi に返り値が渡ってくるのでそのまま出す
 exit:
@@ -229,3 +231,9 @@ string_copy:
     .too_long:
     xor rax, rax
     ret
+
+open:
+    mov rax, 2
+    mov rsi, O_RDONLY
+    mov rdx, 0
+    syscall
