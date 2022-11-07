@@ -1,262 +1,261 @@
-section .text
-global string_length
-global print_char
-global print_newline
-global print_string
-global print_error
-global print_uint
-global print_int
-global string_equals
-global parse_uint
-global parse_int
-global read_word
-global string_copy
-global exit
 
-%define O_RDONLY 0
+	section .text
+	global string_length
+	global print_char
+	global print_newline
+	global print_string
+	global print_error
+	global print_uint
+	global print_int
+	global string_equals
+	global parse_uint
+	global parse_int
+	global read_word
+	global string_copy
+	global exit
 
-; rdi に返り値が渡ってくるのでそのまま出す
+	%define O_RDONLY 0
+
+	;; rdi に返り値が渡ってくるのでそのまま出す
 exit:
-    mov rax, 60
-    syscall
+	mov rax, 60
+	syscall
 
-; rdi に文字列のポインタがきている
+	;; rdi に文字列のポインタがきている
 string_length:
-    xor rax, rax
+	xor rax, rax
     
-    .loop:
-    cmp byte[rdi+rax], 0
-    je .end
-    inc rax
-    jmp .loop
-    .end:
-    ret
+	.loop:
+	cmp byte[rdi+rax], 0
+	je .end
+	inc rax
+	jmp .loop
+	.end:
+	ret
 
-; rdi に文字列のポインタがきている
+	;; rdi に文字列のポインタがきている
 print_string:
-    push rdi
-    call string_length
-    pop rsi
-    mov rdx, rax
-    mov rax, 1
-    mov rdi, 1
-    syscall
-    ret
+	push rdi
+	call string_length
+	pop rsi
+	mov rdx, rax
+	mov rax, 1
+	mov rdi, 1
+	syscall
+	ret
 
 print_error:
-    push rdi
-    call string_length
-    pop rsi
-    mov rdx, rax
-    mov rax, 1
-    mov rdi, 2
-    syscall
-    ret
+	push rdi
+	call string_length
+	pop rsi
+	mov rdx, rax
+	mov rax, 1
+	mov rdi, 2
+	syscall
+	ret
 
-; rsp に文字のポインタが来ている
+	;; rsp に文字のポインタが来ている
 print_char:
-    push rdi
-    mov rdi, rsp
-    call print_string
-    pop rdi
-    ret
+	push rdi
+	mov rdi, rsp
+	call print_string
+	pop rdi
+	ret
 
 print_newline:
-    mov rdi, 10
-    jmp print_char
+	mov rdi, 10
+	jmp print_char
 
 print_uint:
-    mov rax, rdi
-    mov rdi, rsp
-    push 0
-    sub rsp, 16
+	mov rax, rdi
+	mov rdi, rsp
+	push 0
+	sub rsp, 16
 
-    dec rdi
-    mov r8, 10
+	dec rdi
+	mov r8, 10
 
-    .loop:
-    xor rdx, rdx
-    div r8
-    or dl, 0x30
-    dec rdi
-    mov [rdi], dl
-    test rax, rax
-    jnz .loop
+	.loop:
+	xor rdx, rdx
+	div r8
+	or dl, 0x30
+	dec rdi
+	mov [rdi], dl
+	test rax, rax
+	jnz .loop
 
-    call print_string
+	call print_string
 
-    add rsp, 24    
-    ret
+	add rsp, 24
+	ret
 
 print_int:
-    test rdi, rdi
-    jns print_uint
-    push rdi
-    mov rdi, '-'
-    call print_char
-    pop rdi
-    neg rdi
-    jmp print_uint
+	test rdi, rdi
+	jns print_uint
+	push rdi
+	mov rdi, '-'
+	call print_char
+	pop rdi
+	neg rdi
+	jmp print_uint
 
 string_equals:
-    mov al, byte[rdi]
-    cmp al, byte[rsi]
-    jne .no
-    inc rdi
-    inc rsi
-    test al, al
-    jnz string_equals
-    mov rax, 1
-    ret
-    .no:
-    xor rax, rax
-    ret
-
+	mov al, byte[rdi]
+	cmp al, byte[rsi]
+	jne .no
+	inc rdi
+	inc rsi
+	test al, al
+	jnz string_equals
+	mov rax, 1
+	ret
+	.no:
+	xor rax, rax
+	ret
 
 read_char:
-    push 0
-    xor rax, rax
-    xor rdi, rdi
-    mov rsi, rsp
-    mov rdx, 1
-    syscall
-    pop rax
-    ret 
+	push 0
+	xor rax, rax
+	xor rdi, rdi
+	mov rsi, rsp
+	mov rdx, 1
+	syscall
+	pop rax
+	ret
 
 read_word:
-    push r14
-    push r15
-    xor r14, r14
-    mov r15, rsi
-    dec r15
+	push r14
+	push r15
+	xor r14, r14
+	mov r15, rsi
+	dec r15
 
-    .A:
-    push rdi
-    call read_char
-    pop rdi
-    cmp al, ' '
-    je .A
-    cmp al, 10
-    je .A
-    cmp al, 13
-    je .A
-    cmp al, 9
-    je .A
-    test al, al
-    jz .C
+	.A:
+	push rdi
+	call read_char
+	pop rdi
+	cmp al, ' '
+	je .A
+	cmp al, 10
+	je .A
+	cmp al, 13
+	je .A
+	cmp al, 9
+	je .A
+	test al, al
+	jz .C
 
-    .B:
-    mov byte[rdi+r14], al
-    inc r14
+	.B:
+	mov byte[rdi+r14], al
+	inc r14
 
-    push rdi
-    call read_char
-    pop rdi
-    cmp al, ' '
-    je .C
-    cmp al, 10
-    je .C
-    cmp al, 13
-    je .C
-    cmp al, 9
-    je .C
-    test al, al
-    jz .C
-    cmp r14, r15
-    je .D
+	push rdi
+	call read_char
+	pop rdi
+	cmp al, ' '
+	je .C
+	cmp al, 10
+	je .C
+	cmp al, 13
+	je .C
+	cmp al, 9
+	je .C
+	test al, al
+	jz .C
+	cmp r14, r15
+	je .D
 
-    jmp .B
+	jmp .B
 
-    .C:
-    mov byte[rdi+r14], 0
-    mov rax, rdi
+	.C:
+	mov byte[rdi+r14], 0
+	mov rax, rdi
 
-    mov rdx, r14
-    pop r15
-    pop r14
-    ret
+	mov rdx, r14
+	pop r15
+	pop r14
+	ret
 
-    .D:
-    xor rax, rax
-    pop r15
-    pop r14
-    ret
+	.D:
+	xor rax, rax
+	pop r15
+	pop r14
+	ret
 
-; rdi points to a string
-; returns rax: number, rdx : length
+	;; rdi points to a string
+	;; returns rax: number, rdx : length
 parse_uint:
-    mov r8, 10
-    xor rax, rax
-    xor rcx, rcx
-    .loop:
-    movzx r9, byte[rdi+rcx]
-    cmp r9b, '0'
-    jb .end
-    cmp r9b, '9'
-    ja .end
-    xor rdx, rdx
-    mul r8
-    and r9b, 0x0f
-    add rax, r9
-    inc rcx
-    jmp .loop
-    .end:
-    mov rdx, rcx
-    ret
+	mov r8, 10
+	xor rax, rax
+	xor rcx, rcx
+	.loop:
+	movzx r9, byte[rdi+rcx]
+	cmp r9b, '0'
+	jb .end
+	cmp r9b, '9'
+	ja .end
+	xor rdx, rdx
+	mul r8
+	and r9b, 0x0f
+	add rax, r9
+	inc rcx
+	jmp .loop
+	.end:
+	mov rdx, rcx
+	ret
 
-; rdi points to a string
-; returns rax: number, rdx : length
+	;; rdi points to a string
+	;; returns rax: number, rdx : length
 parse_int:
-    mov al, byte[rdi]
-    cmp al, '-'
-    je .signed
-    jmp parse_uint
-    .signed:
-    inc rdi
-    call parse_uint
-    neg rax
-    test rdx, rdx
-    jz .error
+	mov al, byte[rdi]
+	cmp al, '-'
+	je .signed
+	jmp parse_uint
+	.signed:
+	inc rdi
+	call parse_uint
+	neg rax
+	test rdx, rdx
+	jz .error
 
-    inc rdx
-    ret
+	inc rdx
+	ret
 
-    .error:
-    xor rax, rax
-    ret
-
+	.error:
+	xor rax, rax
+	ret
 
 string_copy:
-    push rdi
-    push rsi
-    push rdx
-    call string_length
-    pop rdx
-    pop rsi
-    pop rdi
+	push rdi
+	push rsi
+	push rdx
+	call string_length
+	pop rdx
+	pop rsi
+	pop rdi
 
-    cmp rax, rdx
-    jae .too_long
+	cmp rax, rdx
+	jae .too_long
 
-    push rsi
+	push rsi
 
-    .loop:
-    mov dl, byte[rdi]
-    mov byte[rsi], dl
-    inc rdi
-    inc rsi
-    test dl, dl
-    jnz .loop
+	.loop:
+	mov dl, byte[rdi]
+	mov byte[rsi], dl
+	inc rdi
+	inc rsi
+	test dl, dl
+	jnz .loop
 
-    pop rax
-    ret
+	pop rax
+	ret
 
-    .too_long:
-    xor rax, rax
-    ret
+	.too_long:
+	xor rax, rax
+	ret
 
 open:
-    mov rax, 2
-    mov rsi, O_RDONLY
-    mov rdx, 0
-    syscall
+	mov rax, 2
+	mov rsi, O_RDONLY
+	mov rdx, 0
+	syscall
