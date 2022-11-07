@@ -1,4 +1,4 @@
-OBJS=ret42 hello hello_proper_exit print_rax strlen read_char cat executable_object libso_main
+OBJS=ret42 hello hello_proper_exit print_rax strlen read_char cat executable_object libso_main dict_main
 
 all: ${OBJS}
 
@@ -70,6 +70,16 @@ libso_main: libso_main.o libso.so
 	ld -o $@ libso_main.o -d libso.so --dynamic-linker /lib64/ld-linux-x86-64.so.2
 	chmod u+x $@
 
+dict_main: dict_main.o dict.o stdio.o
+	ld $? -o $@
+	chmod u+x $@
+stdio.o: stdio.s
+	nasm -felf64 $< -o $@
+dict.o: dict.s
+	nasm -felf64 $< -o $@
+dict_main.o: dict_main.s
+	nasm -felf64 $< -o $@
+
 
 clean:
-	rm -f *.o *~ ${OBJS}
+	rm -f *.o *.so *~ ${OBJS}

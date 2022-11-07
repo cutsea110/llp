@@ -1,4 +1,17 @@
-[section .text
+section .text
+global string_length
+global print_char
+global print_newline
+global print_string
+global print_error
+global print_uint
+global print_int
+global string_equals
+global parse_uint
+global parse_int
+global read_word
+global string_copy
+global exit
 
 %define O_RDONLY 0
 
@@ -27,6 +40,16 @@ print_string:
     mov rdx, rax
     mov rax, 1
     mov rdi, 1
+    syscall
+    ret
+
+print_error:
+    push rdi
+    call string_length
+    pop rsi
+    mov rdx, rax
+    mov rax, 1
+    mov rdi, 2
     syscall
     ret
 
