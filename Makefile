@@ -66,7 +66,6 @@ libso.so: libso.o
 libso_main.o: libso_main.s
 	nasm -felf64 $< -o $@
 libso_main: libso_main.o libso.so
-	export LD_LIBRARY_PATH=.
 	ld -o $@ libso_main.o -d libso.so --dynamic-linker /lib64/ld-linux-x86-64.so.2
 	chmod u+x $@
 
