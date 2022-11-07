@@ -1,4 +1,4 @@
-OBJS=ret42 hello hello_proper_exit print_rax strlen read_char cat executable_object
+OBJS=ret42 hello hello_proper_exit print_rax strlen read_char cat executable_object libso_main
 
 all: ${OBJS}
 
@@ -56,6 +56,14 @@ symbols.o: symbols.s
 executable_object.o: executable_object.s
 	nasm -felf64 $< -o $@
 executable_object: executable_object.o symbols.o
+	ld $? -o $@
+	chmod u+x $@
+
+libso.o: libso.s
+	nasm -felf64 $< -o $@
+libso_main.o: libso_main.s
+	nasm -felf64 $< -o $@
+libso_main: libso_main.o libso.o
 	ld $? -o $@
 	chmod u+x $@
 
