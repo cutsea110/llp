@@ -1,4 +1,4 @@
-	Extern _GLOBAL_OFFSET_TABLE
+	extern _GLOBAL_OFFSET_TABLE_
 	global func:function
 
 	section .rodata

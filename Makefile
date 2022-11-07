@@ -61,10 +61,12 @@ executable_object: executable_object.o symbols.o
 
 libso.o: libso.s
 	nasm -felf64 $< -o $@
+libso.so: libso.o
+	ld -shared -o $@ $< 
 libso_main.o: libso_main.s
 	nasm -felf64 $< -o $@
-libso_main: libso_main.o libso.o
-	ld $? -o $@
+libso_main: libso_main.o libso.so
+	ld -o $@ libso_main.o -d ./libso.so --dynamic-linker /lib64/ld-linux-x86-64.so.2
 	chmod u+x $@
 
 
