@@ -1,4 +1,4 @@
-OBJS=ret42 hello hello_proper_exit print_rax strlen read_char cat executable_object libso_main dict_main
+OBJS=ret42 hello hello_proper_exit print_rax strlen read_char cat executable_object libso_main dict_main word_count
 
 all: ${OBJS}
 
@@ -79,6 +79,11 @@ dict.o: dict.s
 dict_main.o: dict_main.s
 	nasm -felf64 $< -o $@
 
+word_count: word_count.o
+	ld $? -o $@
+	chmod u+x $@
+word_count.o: word_count.s
+	nasm -felf64 $< -o $@
 
 clean:
 	rm -f *.o *.so *~ ${OBJS}
