@@ -15,6 +15,12 @@ word_count:
 	je .end
 	cmp r11b, ' '
 	je .init
+	cmp r11b, 0x9 		; \t
+	je .init
+	cmp r11b, 0xa 		; \n
+	je .init
+	cmp r11b, 0xd 		; \r
+	je .init
 	inc rax
 
 	.on:
@@ -23,7 +29,14 @@ word_count:
 	cmp r11b, 0x0
 	je .end
 	cmp r11b, ' '
-	jne .on
+	je .off
+	cmp r11b, 0x9 		; \t
+	je .off
+	cmp r11b, 0xa 		; \n
+	je .off
+	cmp r11b, 0xd 		; \r
+	je .off
+	jmp .on
 
 	.off:
 	mov r11b, [rdi + rcx]
@@ -31,6 +44,12 @@ word_count:
 	cmp r11b, 0x0
 	je .end
 	cmp r11b, ' '
+	je .off
+	cmp r11b, 0x9 		; \t
+	je .off
+	cmp r11b, 0xa 		; \n
+	je .off
+	cmp r11b, 0xd 		; \r
 	je .off
 	inc rax
 	jmp .on
