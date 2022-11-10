@@ -1,4 +1,4 @@
-OBJS=ret42 hello hello_proper_exit print_rax strlen read_char cat executable_object libso_main dict_main word_count word_parity
+OBJS=ret42 hello hello_proper_exit print_rax strlen read_char cat executable_object libso_main dict_main word_count word_parity trimable
 
 all: ${OBJS}
 
@@ -89,6 +89,12 @@ word_parity: word_parity.o
 	ld $? -o $@
 	chmod u+x $@
 word_parity.o: word_parity.s
+	nasm -felf64 $< -o $@
+
+trimable: trimable.o
+	ld $? -o $@
+	chmod u+x $@
+trimable.o: trimable.s
 	nasm -felf64 $< -o $@
 
 clean:
