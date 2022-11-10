@@ -15,6 +15,12 @@ word_parity:
 	je .end_even
 	cmp r11b, ' '
 	je .skip
+	cmp r11b, 0x9 		; \t
+	je .skip
+	cmp r11b, 0xa 		; \n
+	je .skip
+	cmp r11b, 0xd 		; \r
+	je .skip
 
 	.odd:
 	mov r11b, [rdi + rcx]
@@ -22,6 +28,12 @@ word_parity:
 	cmp r11b, 0x0
 	je .end_odd
 	cmp r11b, ' '
+	je .even
+	cmp r11b, 0x9 		; \t
+	je .even
+	cmp r11b, 0xa 		; \n
+	je .even
+	cmp r11b, 0xd 		; \r
 	je .even
 	jmp .odd
 	
@@ -32,6 +44,12 @@ word_parity:
 	cmp r11b, 0x0
 	je .end_even
 	cmp r11b, ' '
+	je .odd
+	cmp r11b, 0x9 		; \t
+	je .odd
+	cmp r11b, 0xa 		; \n
+	je .odd
+	cmp r11b, 0xd 		; \r
 	je .odd
 	jmp .even
 	
