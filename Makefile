@@ -1,4 +1,4 @@
-OBJS=ret42 hello hello_proper_exit print_rax strlen read_char cat executable_object libso_main dict_main word_count word_parity trimable
+OBJS=ret42 hello hello_proper_exit print_rax strlen read_char cat executable_object libso_main dict_main word_count word_parity trimable itc
 
 all: ${OBJS}
 
@@ -96,6 +96,13 @@ trimable: trimable.o
 	chmod u+x $@
 trimable.o: trimable.s
 	nasm -felf64 $< -o $@
+
+itc: itc.o
+	ld $? -o $@
+	chmod u+x $@
+itc.o: itc.s
+	nasm -felf64 $< -o $@
+
 
 clean:
 	rm -f *.o *.so *~ ${OBJS}
