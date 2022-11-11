@@ -8,75 +8,75 @@ trimable:
 	xor rax, rax
 	xor rcx, rcx
 
-	.S: 			; Start
+	.start:
 	mov r11b, [rdi + rcx]
 	inc rcx
 	cmp r11b, 0x0
-	je .EN
+	je .end_no_trimable
 	cmp r11b, ' '
-	je .LS
+	je .in_left_spaces
 
-	.RW: 			; In Right Word
+	.in_word_without_left_spaces:
 	mov r11b, [rdi + rcx]
 	inc rcx
 	cmp r11b, 0x0
-	je .EN
+	je .end_no_trimable
 	cmp r11b, ' '
-	je .RS
-	jmp .RW
+	je .in_right_spaces_without_left_spaces
+	jmp .in_word_without_left_spaces
 
-	.RS: 			; In Right Space
+	.in_right_spaces_without_left_spaces:
 	mov r11b, [rdi + rcx]
 	inc rcx
 	cmp r11b, 0x0
-	je .ER
+	je .end_right_trimable
 	cmp r11b, ' '
-	je .RS
-	jmp .RW
+	je .in_right_spaces_without_left_spaces
+	jmp .in_word_without_left_spaces
 
-	.LS: 			; In Left Space
+	.in_left_spaces:
 	mov r11b, [rdi + rcx]
 	inc rcx
 	cmp r11b, 0x0
-	je .EA
+	je .end_all_spaces
 	cmp r11b, ' '
-	je .LS
+	je .in_left_spaces
 
-	.LW: 			; In Left Word
+	.in_word_with_left_spaces:
 	mov r11b, [rdi + rcx]
 	inc rcx
 	cmp r11b, 0x0
-	je .EL
+	je .end_left_trimable
 	cmp r11b, ' '
-	je .BS
-	jmp .LW
+	je .in_right_spaces_with_left_spaces
+	jmp .in_word_with_left_spaces
 
-	.BS: 			; In Both Space
+	.in_right_spaces_with_left_spaces:
 	mov r11b, [rdi + rcx]
 	inc rcx
 	cmp r11b, 0x0
-	je .EB
+	je .end_both_trimable
 	cmp r11b, ' '
-	je .BS
-	jmp .LW
+	je .in_right_spaces_with_left_spaces
+	jmp .in_word_with_left_spaces
 
-	.EN: 			; None Trimable
+	.end_no_trimable:
 	mov rax, 0x0
 	ret
 
-	.EA: 			; All Spaces
+	.end_all_spaces:
 	mov rax, 0xf
 	ret
 	
-	.EL: 			; Left Trimable
+	.end_left_trimable:
 	mov rax, 0x1
 	ret
 
-	.ER: 			; Right Trimable
+	.end_right_trimable:
 	mov rax, 0x2
 	ret
 
-	.EB: 			; Both Trimable
+	.end_both_trimable:
 	mov rax, 0x3
 	ret
 	
