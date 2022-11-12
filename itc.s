@@ -8,12 +8,15 @@
 
 	section .bss
 	resq 1023
-rstack_start:	resq 1
-input_buf:	resb 1024
+rstack_start:
+	resq 1
+input_buf:
+	resb 1024
 
 	section .text
 
-main_stub:	dq xt_main
+main_stub:
+	dq xt_main
 
 	;; Dictionary
 
@@ -22,7 +25,8 @@ w_drop:
 	dq 0 			; no previous node
 	db "drop", 0
 	db 0 			; Flags = 0
-xt_drop:	dq i_drop
+xt_drop:
+	dq i_drop
 i_drop:
 	add rsp, 8
 	jmp next
@@ -32,7 +36,8 @@ w_init:
 	dq w_drop
 	db "init", 0
 	db 0 			; Flags = 0
-xt_init:	dq i_init
+xt_init:
+	dq i_init
 i_init:
 	mov rstack, rstack_start
 	mov pc, main_stub
@@ -43,7 +48,8 @@ w_docol:
 	dq w_init
 	db "docol", 0
 	db 0 			; Flags = 0
-xt_docol:	dq i_docol
+xt_docol:
+	dq i_docol
 i_docol:
 	sub rstack, 8
 	mov [rstack], pc
@@ -56,7 +62,8 @@ w_exit:
 	dq w_docol
 	db "exit", 0
 	db 0 			; Flags = 0
-xt_exit:	dq i_exit
+xt_exit:
+	dq i_exit
 i_exit:
 	mov pc, [rstack]
 	add rstack, 8
@@ -67,7 +74,8 @@ w_word:
 	dq w_exit
 	db "word", 0
 	db 0 			; Flags = 0
-xt_word:	dq i_word
+xt_word:
+	dq i_word
 i_word:
 	pop rdi
 	call read_word
@@ -79,7 +87,8 @@ w_prints:
 	dq w_word
 	db "prints", 0
 	db 0 			; Flags = 0
-xt_prints:	dq i_prints
+xt_prints:
+	dq i_prints
 i_prints:
 	pop rdi
 	call print_string
@@ -90,7 +99,8 @@ w_bye:
 	dq w_prints
 	db "bye", 0
 	db 0 			; Flags = 0
-xt_bye:		dq i_bye
+xt_bye:
+	dq i_bye
 i_bye:
 	mov rax, 60
 	xor rdi, rdi
@@ -101,7 +111,8 @@ w_inbuf:
 	dq w_bye
 	db "inbuf", 0
 	db 0 			; Flags = 0
-xt_inbuf:	dq i_inbuf
+xt_inbuf:
+	dq i_inbuf
 i_inbuf:
 	push qword input_buf
 	jmp next
