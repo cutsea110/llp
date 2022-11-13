@@ -26,8 +26,8 @@ w_drop:
 	db "drop", 0
 	db 0 			; Flags = 0
 xt_drop:
-	dq i_drop
-i_drop:
+	dq il_drop
+il_drop:
 	add rsp, 8
 	jmp next
 
@@ -37,8 +37,8 @@ w_init:
 	db "init", 0
 	db 0 			; Flags = 0
 xt_init:
-	dq i_init
-i_init:
+	dq il_init
+il_init:
 	mov rstack, rstack_start
 	mov pc, main_stub
 	jmp next
@@ -49,8 +49,8 @@ w_docol:
 	db "docol", 0
 	db 0 			; Flags = 0
 xt_docol:
-	dq i_docol
-i_docol:
+	dq il_docol
+il_docol:
 	sub rstack, 8
 	mov [rstack], pc
 	add w, 8
@@ -63,8 +63,8 @@ w_exit:
 	db "exit", 0
 	db 0 			; Flags = 0
 xt_exit:
-	dq i_exit
-i_exit:
+	dq il_exit
+il_exit:
 	mov pc, [rstack]
 	add rstack, 8
 	jmp next
@@ -75,8 +75,8 @@ w_word:
 	db "word", 0
 	db 0 			; Flags = 0
 xt_word:
-	dq i_word
-i_word:
+	dq il_word
+il_word:
 	pop rdi
 	call read_word
 	push rdx
@@ -88,8 +88,8 @@ w_prints:
 	db "prints", 0
 	db 0 			; Flags = 0
 xt_prints:
-	dq i_prints
-i_prints:
+	dq il_prints
+il_prints:
 	pop rdi
 	call print_string
 	jmp next
@@ -100,8 +100,8 @@ w_bye:
 	db "bye", 0
 	db 0 			; Flags = 0
 xt_bye:
-	dq i_bye
-i_bye:
+	dq il_bye
+il_bye:
 	mov rax, 60
 	xor rdi, rdi
 	syscall
@@ -112,8 +112,8 @@ w_inbuf:
 	db "inbuf", 0
 	db 0 			; Flags = 0
 xt_inbuf:
-	dq i_inbuf
-i_inbuf:
+	dq il_inbuf
+il_inbuf:
 	push qword input_buf
 	jmp next
 
@@ -123,7 +123,7 @@ w_main:
 	db "main", 0
 	db 0 			; Flags = 0
 xt_main:
-	dq i_docol
+	dq il_docol
 	dq xt_inbuf
 	dq xt_word
 	dq xt_drop
@@ -137,4 +137,4 @@ next:
 	add pc, 8
 	jmp [w]
 
-_start:	jmp i_init
+_start:	jmp il_init
