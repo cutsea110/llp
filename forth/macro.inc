@@ -23,7 +23,7 @@ native %1, %2, 0
        db 0 ; to mark the name start
        db %1, 0
        db %3
-       xt_ %+ 2: dq i_docol
+       xt_ %+ %2: dq i_docol
 %endmacro
 
 %macro colon 2

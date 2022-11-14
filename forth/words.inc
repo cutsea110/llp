@@ -167,7 +167,7 @@ stack_base: dq 0
 	push qword[rstack]
 	jmp next
 
-	colon "const", const
+	colon "constant", constant
 
 	; ( str -- header_addr )
 	native "find", find
@@ -434,7 +434,7 @@ stack_base: dq 0
 	dq xt_drop
 	dq xt_drop
 	dq xt_inbuf
-	dq xt_number
+	dq xt_num
 	branch0 .no_word
 
 	dq xt_state, xt_fetch 	; if interpreting, that's it

@@ -34,4 +34,5 @@ next:
 	add pc, 8
 	jmp [w]
 
-_start: jmp i_init
+_start:
+	jmp i_init
