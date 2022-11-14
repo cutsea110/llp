@@ -263,3 +263,205 @@ stack_base: dq 0
 	push rax
 	jmp next
 
+	; jump to a location. location is an offset relative to the argument end
+	; F.e.: |xt_branch| 24 | <next command>
+	;                        ^ branch adds 24 to this address and stores it in PC
+	; branch is a compile-time only word.
+	native "br", branch
+	add pc, [pc]
+	add pc, 8
+	jmp next
+
+	; jump to a location if TOS = 0. location is calculated in a similar way
+	; F.e.: |xt_branch| 24 | <next command>
+	;                        ^ branch adds 24 to this address and stores it in PC
+	; branch0 is a compile-time only word.
+	native "0branch", branch0
+	pop rax
+	test rax, rax
+	jnz .skip
+	add pc, [pc]
+.skip:
+	add pc, 8
+	jmp next
+
+	; pushes a value immediately following this XT
+	native "lit", lit
+	push qword[pc]
+	add pc, 8
+	jmp next
+
+	; address of the input buffer (is used by interpreter/compiler)
+	const inbuf, input_buf
+
+	; address of user memory.
+	const mem, user_mem
+
+	; last word address
+	const last_word, last_word
+
+	; state cell address.
+	; the state cell stores either 1 (compilation mode) or 0 (interpretation mode)
+	const state, state
+
+	const here, [here]
+
+	; ( xt -- )
+	; execute word with this execution token on TOS
+	native "execute", execute
+	pop rax
+	mov w, rax
+	jmp [rax]
+
+	; ( addr -- val )
+	; fetch value from memory
+	native "@", fetch
+	pop rax
+	push qword[rax]
+	jmp next
+
+	; ( val addr -- )
+	; store value by address
+	native "!", write
+	pop rax
+	pop rdx
+	mov [rdx], rax
+	jmp next
+
+	; ( addr -- char )
+	; read one byte starting at addr
+	native "@c", fetch_char
+	pop rax
+	movzx rax, byte[rax]
+	push rax
+	jmp next
+
+	; ( x -- )
+	; add x to the word being defined
+	native ",", comma
+	mov rax, [here]
+	pop qword[rax]
+	add qword[here], 8
+	jmp next
+
+	; ( c -- )
+	; add a single byte to the word being defined
+	native "c.", char_comma
+	mov rax, [here]
+	pop rdx
+	mov [rax], dl
+	add qword[here], 1
+	jmp next
+
+	; ( name flags -- )
+	; create an entry in the dictionary
+	; name is the new name
+	; only immediate flag is implemented ATM
+	native "create", create
+	; link
+	mov rcx, [last_word]
+	mov rsi, [here]
+	mov [rsi], rcx
+	mov [last_word], rsi
+	add rsi, 8
+	mov byte[rsi], 0
+	inc rsi
+
+	; name
+	pop rdi
+	push rsi
+	call string_copy
+	pop rsi
+	push rsi
+	mov rdi, rsi
+	call string_length
+	pop rsi
+	add rsi, rax
+
+	; flags
+	inc rsi
+	pop rax
+	mov [rsi], al
+	inc rsi
+
+	mov [here], rsi
+	jmp next
+
+	; read word from stdin and start defining it
+	colon ":", colon
+.restart:
+	dq xt_inbuf, xt_word
+	branch0 .restart
+	dq xt_lit, 0, xt_inbuf, xt_create
+	dq xt_state, xt_lit, 1, xt_write
+	dq xt_lit, i_docol, xt_comma
+	dq xt_exit
+
+	; end the current word definition
+	colon ";", semicolon, 1
+	dq xt_state, xt_lit, 0, xt_write
+	dq xt_lit, xt_exit, xt_comma
+	dq xt_exit
+
+	; forth interpreter
+	; check the 'branch' and 'branch0' macros in 'macro.inc'
+	colon "interpreter", interpreter
+.start:
+	dq xt_inbuf, xt_word
+	branch0 .end_of_input
+
+	dq xt_inbuf, xt_find 	; find in dict
+
+	dq xt_dup
+	branch0 .number 	; if not found, try to parse as a number
+	dq xt_cfa
+
+	; if is immediate
+	dq xt_dup
+	dq xt_lit, 1, xt_sub, xt_fetch_char, xt_not
+	branch0 .interpreting
+
+	; compile
+	dq xt_comma
+	branch .start
+
+.interpreting:
+	dq xt_execute
+	branch .start
+
+.number:
+	dq xt_drop
+	dq xt_drop
+	dq xt_inbuf
+	dq xt_number
+	branch0 .no_word
+
+	dq xt_state, xt_fetch 	; if interpreting, that's it
+	branch0 .start
+
+	; when compiling, check if it was after a branch
+	dq xt_here, xt_lit, 8, xt_sub
+	dq xt_lit, xt_branch0
+	dq xt_eq, xt_not
+	branch0 .is_branch
+
+	dq xt_here, xt_lit, 8, xt_sub
+	dq xt_lit, xt_branch
+	dq xt_eq, xt_not
+	branch0 .is_branch
+
+	dq xt_lit, xt_lit, xt_comma
+
+.is_branch:
+	dq xt_comma
+
+	branch .start
+
+.no_word:
+	dq xt_drop, xt_inbuf, xt_prints
+	dq xt_lit, msg_no_such_word, xt_prints
+	branch .start
+
+.end_of_input:
+	dq xt_bye
+	dq xt_exit
