@@ -51,7 +51,7 @@
 	jmp next
 
 	; ( y x -- [ x mod y ] )
-	native "/", mod
+	native "%", mod
 	pop rcx
 	pop rax
 	cqo
@@ -277,7 +277,7 @@ stack_base: dq 0
 	; F.e.: |xt_branch| 24 | <next command>
 	;                        ^ branch adds 24 to this address and stores it in PC
 	; branch0 is a compile-time only word.
-	native "0branch", branch0
+	native "0br", branch0
 	pop rax
 	test rax, rax
 	jnz .skip
@@ -347,7 +347,7 @@ stack_base: dq 0
 
 	; ( c -- )
 	; add a single byte to the word being defined
-	native "c.", char_comma
+	native "c,", char_comma
 	mov rax, [here]
 	pop rdx
 	mov [rax], dl
@@ -417,6 +417,10 @@ stack_base: dq 0
 	branch0 .number 	; if not found, try to parse as a number
 	dq xt_cfa
 
+	; if compile
+	dq xt_state, xt_fetch
+	branch0 .interpreting
+
 	; if is immediate
 	dq xt_dup
 	dq xt_lit, 1, xt_sub, xt_fetch_char, xt_not
@@ -439,7 +443,6 @@ stack_base: dq 0
 
 	dq xt_state, xt_fetch 	; if interpreting, that's it
 	branch0 .start
-
 	; when compiling, check if it was after a branch
 	dq xt_here, xt_lit, 8, xt_sub
 	dq xt_lit, xt_branch0
