@@ -14,7 +14,7 @@
 
 	; ( a -- a a )
 	native "dup", dup
-	push qword[rsp]
+	push qword [rsp]
 	jmp next
 
 	; ( a b c -- b c a )
@@ -125,10 +125,10 @@ stack_base: dq 0
 
 	; stores the data stack base. it is useful for .S
 	native "init", init
-	mov qword[state], 0
+	mov qword [state], 0
 	mov rstack, rstack_start
 	mov pc, interpreter_stub
-	cmp qword[stack_base], 0
+	cmp qword [stack_base], 0
 	je .first
 	mov rsp, [stack_base]
 	jmp next
@@ -164,7 +164,7 @@ stack_base: dq 0
 
 	; non-destructive copy from the top of rstack to the top of data stack
 	native "r@", r_fetch.
-	push qword[rstack]
+	push qword [rstack]
 	jmp next
 
 	colon "constant", constant
@@ -185,7 +185,7 @@ stack_base: dq 0
 	test rsi, rsi
 	jnz .loop
 .not_found:
-	mov qword[rsp], 0
+	mov qword [rsp], 0
 	push 0
 	jmp next
 .found:
@@ -288,7 +288,7 @@ stack_base: dq 0
 
 	; pushes a value immediately following this XT
 	native "lit", lit
-	push qword[pc]
+	push qword [pc]
 	add pc, 8
 	jmp next
 
@@ -318,7 +318,7 @@ stack_base: dq 0
 	; fetch value from memory
 	native "@", fetch
 	pop rax
-	push qword[rax]
+	push qword [rax]
 	jmp next
 
 	; ( val addr -- )
@@ -333,7 +333,7 @@ stack_base: dq 0
 	; read one byte starting at addr
 	native "@c", fetch_char
 	pop rax
-	movzx rax, byte[rax]
+	movzx rax, byte [rax]
 	push rax
 	jmp next
 
@@ -341,8 +341,8 @@ stack_base: dq 0
 	; add x to the word being defined
 	native ",", comma
 	mov rax, [here]
-	pop qword[rax]
-	add qword[here], 8
+	pop qword [rax]
+	add qword [here], 8
 	jmp next
 
 	; ( c -- )
@@ -351,7 +351,7 @@ stack_base: dq 0
 	mov rax, [here]
 	pop rdx
 	mov [rax], dl
-	add qword[here], 1
+	add qword [here], 1
 	jmp next
 
 	; ( name flags -- )
@@ -365,7 +365,7 @@ stack_base: dq 0
 	mov [rsi], rcx
 	mov [last_word], rsi
 	add rsi, 8
-	mov byte[rsi], 0
+	mov byte [rsi], 0
 	inc rsi
 
 	; name

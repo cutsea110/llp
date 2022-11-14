@@ -20,7 +20,7 @@ string_length:
 	xor rax, rax
     
 	.loop:
-	cmp byte[rdi+rax], 0
+	cmp byte [rdi+rax], 0
 	je .end
 	inc rax
 	jmp .loop
@@ -84,7 +84,7 @@ print_int:
 ;;; rdi points to a string
 ;;; returns rax: number, rdx : length
 parse_int:
-	mov al, byte[rdi]
+	mov al, byte [rdi]
 	cmp al, '-'
 	je .signed
 	jmp parse_uint
@@ -109,7 +109,7 @@ parse_uint:
 	xor rax, rax
 	xor rcx, rcx
 	.loop:
-	movzx r9, byte[rdi+rcx]
+	movzx r9, byte [rdi+rcx]
 	cmp r9b, '0'
 	jb .end
 	cmp r9b, '9'
@@ -125,8 +125,8 @@ parse_uint:
 	ret
 
 string_equals:
-	mov al, byte[rdi]
-	cmp al, byte[rsi]
+	mov al, byte [rdi]
+	cmp al, byte [rsi]
 	jne .no
 	inc rdi
 	inc rsi
@@ -168,7 +168,7 @@ read_word:
 	jz .C
 
 	.B:
-	mov byte[rdi+r14], al
+	mov byte [rdi+r14], al
 	inc r14
 
 	push rdi
@@ -190,7 +190,7 @@ read_word:
 	jmp .B
 
 	.C:
-	mov byte[rdi+r14], 0
+	mov byte [rdi+r14], 0
 	mov rax, rdi
 
 	mov rdx, r14
@@ -198,8 +198,8 @@ read_word:
 	ret
 
 string_copy:
-	mov dl, byte[rdi]
-	mov byte[rsi], dl
+	mov dl, byte [rdi]
+	mov byte [rsi], dl
 	inc rdi
 	inc rsi
 	test dl, dl
