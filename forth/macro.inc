@@ -38,7 +38,7 @@ colon %1, %2, 0
 %macro rpop 1
        mov %1, qword[rstack]
        add rstack, 8
-%macro
+%endmacro
 
 %macro const 2
 %defstr %%__cnst_str %1

@@ -157,6 +157,7 @@ stack_base: dq 0
 	jmp next
 
 	; push from rstack into data stack
+	native "r>", from_r
 	rpop rax
 	push rax
 	jmp next
