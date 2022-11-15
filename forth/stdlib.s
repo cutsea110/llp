@@ -138,6 +138,7 @@ string_equals:
 	xor rax, rax
 	ret
 
+;;; returns rax: char
 read_char:
 	push 0
 	xor rax, rax
@@ -148,6 +149,7 @@ read_char:
 	pop rax
 	ret
 
+;;; returns rax: point to word, rdx: length
 read_word:
 	push r14
 	xor r14, r14

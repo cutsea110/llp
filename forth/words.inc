@@ -226,7 +226,7 @@ stack_base: dq 0
 	push rdx
 	jmp next
 
-	; ( str -- len num )
+	; ( str -- num len )
 	; parse an integer from string
 	native "num", num
 	pop rdi
