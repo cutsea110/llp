@@ -186,7 +186,6 @@ stack_base: dq 0
 	jnz .loop
 .not_found:
 	mov qword [rsp], 0
-	push 0
 	jmp next
 .found:
 	mov [rsp], rsi
@@ -435,7 +434,6 @@ stack_base: dq 0
 	branch .start
 
 .number:
-	dq xt_drop
 	dq xt_drop
 	dq xt_inbuf
 	dq xt_num
